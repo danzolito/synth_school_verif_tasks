@@ -83,6 +83,7 @@ module testbench;
         wait(aresetn);
         @(posedge clk);
         @(posedge clk);
+        @(posedge clk);
         if (C !== 5) $error("BAD");
         $stop();
 
