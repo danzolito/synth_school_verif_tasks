@@ -26,7 +26,7 @@ module testbench;
     initial begin
         clk <= 0;
         forever begin
-            #(CLK_PERIOD/2) clk ~= clk;
+            #(CLK_PERIOD/2) clk <= ~clk;
         end
 
     end
