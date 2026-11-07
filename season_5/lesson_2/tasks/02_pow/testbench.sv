@@ -412,7 +412,7 @@ module testbench;
                 // Иначе пришел сигнал сброса. Очищаем mailbox
                 // от входящих транзакций, т.к все они будут
                 // "выкинуты" из конвейера при приходе сигнала сброса
-                while(in_mbx.try_get(in_p)) cnt = cnt + in_p.tlast;;
+                while(in_mbx.try_get(in_p)) cnt = cnt + in_p.tlast;
             end
         endtask
 
@@ -520,6 +520,12 @@ module testbench;
 
     class test_cfg_bottleneck extends test_cfg_base;
 
+        constraint bottleneck_c {
+            master_delay_min != 0;
+            slave_delay_min != 0;
+            slave_delay_min >= master_delay_max * 5;
+        }
+
 
     endclass
 
@@ -535,6 +541,16 @@ module testbench;
             test_cfg_bottleneck cfg_bottleneck;
             super.new();
             // TODO: Пишите здесь
+
+            cfg_bottleneck = new();
+            if( !cfg_bottleneck.randomize()  ) begin
+                $error("Can't randomize test!");
+                $finish();
+            end
+
+            env.master.master_gen.cfg   =   cfg_bottleneck;
+            env.slave.slave_driver.cfg  =   cfg_bottleneck;
+            env.check.cfg               =   cfg_bottleneck;
         endfunction
 
     endclass
@@ -547,6 +563,9 @@ module testbench;
 
     initial begin
         // TODO: Пишите здесь.
+        test_bottleneck test;
+        test = new();
+
         fork
             reset();
             test.run();
